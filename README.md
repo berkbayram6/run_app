@@ -63,7 +63,21 @@ iPhone'a kendi uygulamanı kurmak için **Apple Developer Program** üyeliği ge
    ```
 4. 10 ila 20 dakika sonra bir bağlantı ve QR kod verir. iPhone'da açıp **Yükle**'ye bas.
 
-**Ücretsiz seçenek (Mac gerekir):** Mac'in varsa Xcode'u kurup ücretsiz Apple kimliğinle telefona doğrudan yükleyebilirsin: iPhone'u kabloyla bağla, `npx expo run:ios --device` çalıştır. Bu yolla kurulan uygulama 7 gün sonra açılmaz olur, tekrar yüklemek gerekir.
+#### Ücretsiz yol: Mac ve Xcode ile (Apple Developer gerekmez)
+
+Mac'in varsa ücretli üyelik olmadan, ücretsiz Apple kimliğinle kurabilirsin. Tek fark: bu yolla kurulan uygulama **7 gün sonra açılmaz**, aynı komutla yeniden yüklemen gerekir (koşu geçmişin silinmez).
+
+1. Mac'te App Store'dan **Xcode**'u kur ve bir kez açıp ek bileşenleri yüklemesine izin ver.
+2. Xcode'da **Settings > Accounts**'ta **+** ile Apple kimliğini ekle.
+3. CocoaPods'u kur: `brew install cocoapods` (Homebrew yoksa [brew.sh](https://brew.sh)).
+4. iPhone'u kabloyla Mac'e bağla, telefonda **"Bu Bilgisayara Güven"**'e bas. **Ayarlar > Gizlilik ve Güvenlik > Geliştirici Modu**'nu aç.
+5. Proje klasöründe şunu çalıştır ve listeden iPhone'unu seç:
+   ```bash
+   npx expo run:ios --device --configuration Release
+   ```
+   `Release` sayesinde uygulama bilgisayara bağlı olmadan, dışarıda tek başına çalışır.
+6. İmzalama (signing) hatası çıkarsa: `ios` klasöründeki `.xcworkspace` dosyasını Xcode'da aç, sol üstte projeyi seç, **Signing & Capabilities** sekmesinde **Team** olarak kendi adınla "(Personal Team)"ı seç, sonra 5. adımı tekrarla.
+7. Uygulama ilk açılışta "Güvenilmeyen Geliştirici" derse: iPhone'da **Ayarlar > Genel > VPN ve Cihaz Yönetimi**'nde kendi Apple kimliğine dokunup **Güven**'e bas.
 
 ### Android için
 
