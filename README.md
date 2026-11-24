@@ -6,7 +6,7 @@ Koştuğun güzergahı haritada çizen, süreni, mesafeni, anlık hızını ve t
 
 - **Canlı takip:** Başlat, Duraklat, Devam, Bitir. Güzergah haritada turuncu çizgiyle çizilir, harita seninle birlikte kayar.
 - **Ekranda:** süre, mesafe (km), anlık hız (km/sa), anlık tempo ve ortalama tempo (dk/km).
-- **Ekran kilitliyken takip:** Kendi derlenmiş uygulamada (aşağıdaki 2. yol) telefon cebindeyken de konum alınır. Android'de bildirim çubuğunda "Koşu kaydediliyor" görünür.
+- **Ekran kilitliyken takip:** Uygulama olarak kurulduğunda (aşağıdaki 2. yol) telefon cebindeyken de konum alınır. Android'de bildirim çubuğunda "Koşu kaydediliyor" görünür.
 - **GPS hatası süzme:** Doğruluğu 30 m'den kötü ölçümler, 43 km/sa'ten hızlı görünen sıçramalar ve yerinde dururken oluşan küçük titreşimler mesafeye eklenmez.
 - **Geçmiş:** Biten koşu kaydedilir. "Geçmiş" sekmesinde listelenir, dokununca güzergahı haritada ve özetiyle açılır, silinebilir.
 - Uygulama koşu sırasında kapanırsa, açıldığında koşu kaldığı yerden devam eder.
@@ -26,19 +26,76 @@ Telefonuna **Expo Go** uygulamasını kur (App Store / Google Play). Ekranda ç�
 
 Expo Go'da arka plan konumu çalışmaz: uygulama bunu fark eder, ekranı açık tutar ve üstte bir uyarı gösterir. Koşu boyunca uygulamayı önde tut.
 
-## 2. yol: Kendi uygulamanı derlemek (ekran kilitliyken takip)
+## 2. yol: Uygulama olarak kurmak (ekran kilitliyken takip)
 
-Ücretsiz bir [Expo hesabı](https://expo.dev/signup) aç, sonra:
+Ekran kilitliyken takip yalnızca telefona kurulan kendi uygulamanda çalışır, Expo Go'da çalışmaz. Derlemeyi Expo'nun bulut sunucuları (EAS) yapar, bilgisayarına Xcode veya Android Studio kurman gerekmez.
 
-```bash
-npm install -g eas-cli
-eas login
-eas build --profile preview --platform android
-```
+### Hazırlık (bir kez)
 
-Derleme bitince verilen bağlantıdan APK'yı telefona indirip kur. iPhone için `--platform ios` gerekir ve bunun için Apple Developer hesabı (yıllık 99 $) şart.
+1. Bilgisayarda proje klasörüne gir ve en son kodu al:
+   ```bash
+   cd run_app
+   git pull
+   npm install
+   ```
+2. EAS aracını kur ve Expo hesabınla giriş yap:
+   ```bash
+   npm install -g eas-cli
+   eas login
+   ```
+3. Projeyi Expo hesabına bağla (soru sorarsa **Y** de):
+   ```bash
+   eas init
+   ```
 
-Kurulumda konum izni sorulduğunda **"Her zaman izin ver"** seçeneğini seç, yoksa ekran kilitliyken takip olmaz.
+### iPhone için
+
+iPhone'a kendi uygulamanı kurmak için **Apple Developer Program** üyeliği gerekir (yıllık 99 $, [developer.apple.com/programs](https://developer.apple.com/programs/)). Üyelik onayı birkaç saat ile bir gün sürebilir.
+
+1. iPhone'unu tanıt. Komut bir QR kod / bağlantı verir, iPhone'da açıp profili yükle:
+   ```bash
+   eas device:create
+   ```
+2. iPhone'da **Ayarlar > Gizlilik ve Güvenlik > Geliştirici Modu**'nu aç (telefon yeniden başlar).
+3. Derlemeyi başlat. Apple hesabınla giriş yapmanı ister, sertifikaları kendisi oluşturur (sorulara **Y** de):
+   ```bash
+   eas build --profile preview --platform ios
+   ```
+4. 10 ila 20 dakika sonra bir bağlantı ve QR kod verir. iPhone'da açıp **Yükle**'ye bas.
+
+#### Ücretsiz yol: Mac ve Xcode ile (Apple Developer gerekmez)
+
+Mac'in varsa ücretli üyelik olmadan, ücretsiz Apple kimliğinle kurabilirsin. Tek fark: bu yolla kurulan uygulama **7 gün sonra açılmaz**, aynı komutla yeniden yüklemen gerekir (koşu geçmişin silinmez).
+
+1. Mac'te App Store'dan **Xcode**'u kur ve bir kez açıp ek bileşenleri yüklemesine izin ver.
+2. Xcode'da **Settings > Accounts**'ta **+** ile Apple kimliğini ekle.
+3. CocoaPods'u kur: `brew install cocoapods` (Homebrew yoksa [brew.sh](https://brew.sh)).
+4. iPhone'u kabloyla Mac'e bağla, telefonda **"Bu Bilgisayara Güven"**'e bas. **Ayarlar > Gizlilik ve Güvenlik > Geliştirici Modu**'nu aç.
+5. Proje klasöründe şunu çalıştır ve listeden iPhone'unu seç:
+   ```bash
+   npx expo run:ios --device --configuration Release
+   ```
+   `Release` sayesinde uygulama bilgisayara bağlı olmadan, dışarıda tek başına çalışır.
+6. İmzalama (signing) hatası çıkarsa: `ios` klasöründeki `.xcworkspace` dosyasını Xcode'da aç, sol üstte projeyi seç, **Signing & Capabilities** sekmesinde **Team** olarak kendi adınla "(Personal Team)"ı seç, sonra 5. adımı tekrarla.
+7. Uygulama ilk açılışta "Güvenilmeyen Geliştirici" derse: iPhone'da **Ayarlar > Genel > VPN ve Cihaz Yönetimi**'nde kendi Apple kimliğine dokunup **Güven**'e bas.
+
+### Android için
+
+Ücretsizdir, Google hesabı gerekmez.
+
+1. Derlemeyi başlat (sorulara **Y** de):
+   ```bash
+   eas build --profile preview --platform android
+   ```
+2. 10 ila 20 dakika sonra bir bağlantı ve QR kod verir. Telefonda açıp APK'yı indir ve kur ("Bilinmeyen kaynaklara izin ver" sorulursa izin ver).
+
+Kendi derlenmiş Android uygulamasında haritanın görünmesi için Google Maps anahtarı gerekir (aşağıya bak).
+
+### İlk açılışta izinler
+
+- Konum izni sorulduğunda önce **"Uygulamayı Kullanırken"** seç.
+- Koşuyu başlatınca ikinci kez sorar: iPhone'da **"Her Zaman İzin Ver"**, Android'de **"Her zaman izin ver"** seç. Bunu seçmezsen ekran kilitliyken takip olmaz.
+- Android bildirim izni isterse ver: koşu sürerken bildirim çubuğunda "Koşu kaydediliyor" görünür.
 
 ### Android'de harita için Google Maps anahtarı
 
